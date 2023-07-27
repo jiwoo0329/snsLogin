@@ -9,15 +9,15 @@ export default function KakaoSignOut() {
 
         // 카카오 로그인 링크 해제
         kakao.API.request({
-        url: "/v1/user/unlink",
-        success: (res) => {
-            // 로그인 성공할 경우 정보 확인 후 / 페이지로 push
-            console.log("로그아웃 성공 정보", res);
-            // Router.push('/');
-        },
-        fail: (error) => {
-            console.log(error);
-        },
+            url: "/v1/user/unlink",
+            success: (res) => {
+                // 로그인 성공할 경우 정보 확인 후 / 페이지로 push
+                console.log("로그아웃 성공 정보", res);
+                // Router.push('/');
+            },
+            fail: (error) => {
+                console.log(error);
+            },
         });
     };
     return (

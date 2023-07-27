@@ -1,31 +1,56 @@
 'use client';
-import { useEffect } from "react";
-export default function GoogleSignIn() {
-  // 예시
-  const GOOGLE_LOGIN_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_JW_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_JW_GOOGLE_CALLBACK_URL}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`;
 
-  const login = () => {
+import { useState, useEffect } from "react";
+import jwt_decode from 'jwt-decode';
 
-    // const google = (window).google;
+export default function GoogleSignIn(){
 
-    // google.accounts.id.initialize({
-    //   client_id: process.env.NEXT_PUBLIC_JW_GOOGLE_CLIENT_ID,
-    //   callback: process.env.NEXT_PUBLIC_JW_GOOGLE_CALLBACK_URL,
-      
-    // });
-    // google.accounts.id.prompt();
-
-    window.location.href = GOOGLE_LOGIN_URL
-  };
+    const [user, setUser] = useState({});
 
 
+    let handleCallbackResponse = (res) => {
+        console.log("res", res.credential)
 
- 
+        let userObject = jwt_decode(res.credential);
+        setUser(userObject);
+
+        document.getElementById('signInDiv').hidden = true;
 
 
-  return (
-    <>
-      <button onClick={()=>login()}>구글 로그인</button>
-    </>
-  );
+    }
+    useEffect(()=>{
+        google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_JW_GOOGLE_CLIENT_ID,
+            callback: handleCallbackResponse
+        });
+
+        google.accounts.id.renderButton(document.getElementById('signInDiv'), {
+            theme:'outline',
+            size: 'large'
+        });
+
+        google.accounts.id.prompt();
+    },[]);
+
+
+    const handleLogout = () => {
+        setUser({});
+        document.getElementById('signInDiv').hidden = false
+    }
+
+    // 참고 유튜브: https://www.youtube.com/watch?v=xLzRh4k-0dg&t=154s
+
+
+    return(
+        <>
+        <button type="button" id="signInDiv">구글 로그인</button>
+
+        {Object.keys(user).length !== 0 && <button onClick={()=>{handleLogout()}}>signout</button>}
+
+        {user && <div>
+            <h1>{user.name}</h1>
+            <img src={user.picture} alt="이미지"></img>
+            </div>}
+        </>
+    )
 }
